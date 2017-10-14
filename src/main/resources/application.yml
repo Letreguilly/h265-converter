@@ -1,0 +1,13 @@
+app:
+    name: h265-converter
+    message: Hello ${app.name}}
+
+server:
+    port: 9000
+
+spring:
+    data:
+        elasticsearch:
+            properties:
+                http:
+                    enabled: true

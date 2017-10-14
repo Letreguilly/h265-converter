@@ -1,0 +1,11 @@
+# folder
+target/
+data/
+.idea/
+
+#intellij
+*.iml
+
+#maven
+dependency-reduced-pom.xml
+
