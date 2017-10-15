@@ -1,6 +1,7 @@
 # folder
 target/
-data/
+elasticsearch-data/
+bin/
 .idea/
 
 #intellij
