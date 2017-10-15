@@ -39,22 +39,38 @@ public class NodeService {
             byte[] mac = network.getHardwareAddress();
 
             //set info
-            localNode.setId(NumberUtils.bytesToLong(mac));
-            localNode.setName(ip.getHostName());
-            localNode.setIPAddress(ip.getAddress());
-            localNode.setMacAddress(mac);
-            localNode.setCpuArch(CpuUtils.getCpuArch());
-            localNode.setCpuCore(CpuUtils.getNumberOfCPUCores());
-            localNode.setOperatingSystem(OsUtils.getOS());
+            this.localNode.setId(NumberUtils.bytesToLong(mac));
+            this.localNode.setName(ip.getHostName());
+            this.localNode.setIPAddress(ip.getAddress());
+            this.localNode.setMacAddress(mac);
+            this.localNode.setCpuArch(CpuUtils.getCpuArch());
+            this.localNode.setCpuCore(CpuUtils.getNumberOfCPUCores());
+            this.localNode.setOperatingSystem(OsUtils.getOS());
 
-            //save to db
-            localNode = nodeRepository.save(localNode);
-            clusterNodes.addAll(nodeRepository.findAll());
+            //get all node
+            nodeRepository.findAll().forEach(node -> clusterNodes.add(node));
+
+            //register node
+            if(this.clusterNodes.contains(localNode)){
+                log.info("Node "+ this.localNode.getName() + " already registered, updating information");
+                this.localNode = nodeRepository.save(localNode);
+            }else{
+                log.info("Register new node " + this.localNode.getName());
+                this.localNode = this.registerNewNode(localNode);
+            }
         } catch (UnknownHostException | SocketException e) {
             log.error("can not find current node mac address, node id is based on the mac address, exiting", e);
             System.exit(-1);
         }
     }
 
+    public Node registerNewNode(Node node){
+        return nodeRepository.save(localNode);
+    }
+
+
+    public List<Node> getAllNodes(){
+        return  clusterNodes;
+    }
 
 }

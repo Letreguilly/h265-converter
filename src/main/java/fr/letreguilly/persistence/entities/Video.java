@@ -1,5 +1,6 @@
 package fr.letreguilly.persistence.entities;
 
+import fr.letreguilly.utils.helper.NumberUtils;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -23,15 +24,10 @@ public class Video {
     private VideoExtension extension;
 
     public void setMd5(String md5) {
+        this.md5 = md5;
+
         if (id == null) {
-            this.md5 = md5;
-
-            byte[] md5Bytes = md5.getBytes();
-            this.id = 0L;
-
-            for (int i = 0; i < md5Bytes.length; i++) {
-                this.id = this.id + (md5Bytes[i] * (256 ^ i));
-            }
+            this.id = NumberUtils.stringToLong(md5);
         }
     }
 }
