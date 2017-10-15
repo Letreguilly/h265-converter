@@ -56,14 +56,6 @@ public class BinaryService {
             }
         }
 
-
-
-
-        /*if ((binaryFolder.exists() && binaryFolder.isDirectory() && binaryFolder.canWrite()) == false || (binaryFolder.exists() == false && binaryFolder.mkdirs() == false)) {
-            log.error("can not access or create bin folder");
-            throw new IOException("can not access or create bin folder");
-        }*/
-
         //extract binary to bin folder
         String binaryFilepath;
         if(OsUtils.getOS().equals(OsName.windows)){

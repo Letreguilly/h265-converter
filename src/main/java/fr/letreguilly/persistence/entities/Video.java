@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 @Data
-@Document(indexName = "video")
+@Document(indexName = "video", shards = 1, replicas = 2)
 public class Video {
     @Id
     private Long id;

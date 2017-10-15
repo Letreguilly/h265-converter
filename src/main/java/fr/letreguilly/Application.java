@@ -26,11 +26,11 @@ public class Application {
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(Application.class);
 
-        try {
+       /* try {
             BinaryService.getBinary("ffmpeg");
         } catch (IOException e) {
             log.error("can not find binary ffmpeg", e);
-        }
+        }*/
 
     }
 
