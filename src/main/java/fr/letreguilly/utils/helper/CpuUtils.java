@@ -1,5 +1,6 @@
 package fr.letreguilly.utils.helper;
 
+import fr.letreguilly.utils.enumeration.CpuArch;
 import fr.letreguilly.utils.enumeration.OsName;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
@@ -12,11 +13,11 @@ public class CpuUtils {
 
     private static Integer cpuCoreNumber;
 
-    public static OsName getOsArch() {
-        if (EnumUtils.isValidEnum(OsName.class, System.getProperty("os.arch"))) {
-            return OsName.valueOf(System.getProperty("os.arch"));
+    public static CpuArch getCpuArch() {
+        if (EnumUtils.isValidEnum(CpuArch.class, System.getProperty("os.arch"))) {
+            return CpuArch.valueOf(System.getProperty("os.arch"));
         }else{
-            return OsName.unknown;
+            return CpuArch.unknown;
         }
     }
 

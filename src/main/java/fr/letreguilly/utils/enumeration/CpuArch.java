@@ -1,5 +1,5 @@
 package fr.letreguilly.utils.enumeration;
 
 public enum CpuArch {
-    amd64,x86, armhf, arm64
+    amd64,x86, armhf, arm64, unknown
 }

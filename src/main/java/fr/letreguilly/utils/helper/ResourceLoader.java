@@ -19,20 +19,20 @@ public class ResourceLoader {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
 
-    public static byte[] readByteArray(String fileName) {
-        URL fileURL = Thread.currentThread().getContextClassLoader().getResource(fileName);
-        if (fileURL == null) {
-            throw new RuntimeException("Cannot get resource file \"" + fileName +"\"");
-        }
+    public static byte[] readByteArray(String fileName) throws IOException {
+        //URL fileURL = Thread.currentThread().getContextClassLoader().getResource(fileName);
+        //if (fileURL == null) {
+        //    throw new IOException("Cannot get resource file \"" + fileName +"\"");
+        //}
 
         //Handle Windows path (starts with HDD letter but we have to remove /)
-        String testFilePath = fileURL.getFile().replaceFirst("^/([CD])", "$1");
+        //String testFilePath = fileURL.getFile().replaceFirst("^/([CD])", "$1");
 
         byte[] encoded;
-        try {
-            encoded = Files.readAllBytes(Paths.get(testFilePath));
+        //try {
+          //  encoded = Files.readAllBytes(Paths.get(testFilePath));
 
-        } catch (IOException e) {
+        //} catch (Exception e) {
             // Load from a jar
             ClassPathResource resource = new ClassPathResource(fileName);
             try {
@@ -42,13 +42,13 @@ public class ResourceLoader {
             } catch (IOException e1) {
                 throw new RuntimeException("Error reading resource file \"" + fileName +"\"");
             }
-        }
+        //}
 
         log.debug("Read resource file \"" + fileName + "\"");
         return encoded;
     }
 
-    public static String readString(String fileName) throws UnsupportedEncodingException {
+    public static String readString(String fileName) throws IOException {
         return new String(readByteArray(fileName), "UTF-8");
     }
 
