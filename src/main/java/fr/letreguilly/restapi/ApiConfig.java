@@ -12,5 +12,6 @@ public class ApiConfig extends ResourceConfig {
     public ApiConfig() {
         this.register(HealthCheckEntryPoint.class);
         this.register(NodeEntryPoint.class);
+        this.register(FolderEntryPoint.class);
     }
 }

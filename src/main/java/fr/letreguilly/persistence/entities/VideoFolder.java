@@ -8,6 +8,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,16 +20,19 @@ public class VideoFolder {
 
     private String name;
 
-    private Map<String, String> nodePathMap;
+    //Key: node, value: path
+    private Map<Long, String> nodePathMap = new HashMap();
 
-    public VideoFolder (String name, String node, String path) {
+    public VideoFolder () {
+    }
 
+    public VideoFolder (String name, Long node, String path) {
         this.name = name;
         this.nodePathMap.put(node, path);
         this.id = NumberUtils.stringToLong(name);
     }
 
-    public void addNode (String node, String path) {
+    public void addNode (Long node, String path) {
         this.nodePathMap.put(node, path);
     }
 

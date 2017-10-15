@@ -19,6 +19,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -79,26 +80,47 @@ public class NodeService {
         return  clusterNodes;
     }
 
-    public void addFolder (String name, String path) {
+    public List<VideoFolder> getAllFolders(){
+        List<VideoFolder> clusterVideoFolders = new ArrayList();
+        videoFolderRepository.findAll().forEach(folder -> clusterVideoFolders.add(folder));
+        return  clusterVideoFolders;
+    }
+
+    public List<VideoFolder> getAllFoldersByNode(Node node){
+        List<VideoFolder> nodeVideoFolders = new ArrayList();
+
+        videoFolderRepository.findAll().forEach(folder -> {
+            if(folder.getNodePathMap().containsKey(node.getId())) {
+                nodeVideoFolders.add(folder);
+            }
+        });
+
+        return  nodeVideoFolders;
+    }
+
+    public VideoFolder addFolder (String name, String path) {
         Long folderId = NumberUtils.stringToLong(name);
         VideoFolder existingFolder = videoFolderRepository.findOne(folderId);
 
         if (existingFolder == null) {  // create a new folder
-            VideoFolder newFolder = new VideoFolder(name, path, localNode.getName());
+            VideoFolder newFolder = new VideoFolder(name, localNode.getId(), path);
+            return videoFolderRepository.save(newFolder);
         }
         else {
             // check if there is already a path on this node
             if (existingFolder.getNodePathMap().containsKey(localNode.getName()) == false) {
-                existingFolder.addNode(localNode.getName(), path);
+                existingFolder.addNode(localNode.getId(), path);
+                return videoFolderRepository.save(existingFolder);
             }
             else {
                 log.warn("This folder has already been added on this node.");
             }
         }
+        return null;
     }
 
     public File getNodeFolderFile (VideoFolder folder) {
-        String path = folder.getNodePathMap().get(localNode.getName());
+        String path = folder.getNodePathMap().get(localNode.getId());
         File folderFile = new File(path);
         return folderFile;
     }
