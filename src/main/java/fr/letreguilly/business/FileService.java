@@ -12,7 +12,7 @@ public class FileService {
      * @param directory the directory to list
      * @return the file list
      */
-    public static List<File> listFile(File directory){
+    public static List<File> listFile(File directory){  // or listFile(VideoFolder folder) and then File directory = NodeService.getNodeFolderFile(folder);
         List<File> fileList = new ArrayList();
 
         if(directory.canRead() && directory.isDirectory()){
@@ -32,7 +32,7 @@ public class FileService {
     }
 
     /**
-     * return file midified after the lastmodificationdate parameter
+     * return file modified after the lastmodificationdate parameter
      * @param filesToFilter the list of file to filter
      * @param lastModificationDate the last modification date
      * @return

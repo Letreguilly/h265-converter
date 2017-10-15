@@ -1,14 +1,18 @@
 package fr.letreguilly.business;
 
 import fr.letreguilly.persistence.entities.Node;
+import fr.letreguilly.persistence.entities.VideoFolder;
 import fr.letreguilly.persistence.repositories.NodeRepository;
+import fr.letreguilly.persistence.repositories.VideoFolderRepository;
 import fr.letreguilly.utils.helper.CpuUtils;
+import fr.letreguilly.utils.helper.NumberUtils;
 import fr.letreguilly.utils.helper.OsUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -26,6 +30,9 @@ public class NodeService {
 
     @Autowired
     private NodeRepository nodeRepository;
+
+    @Autowired
+    private VideoFolderRepository videoFolderRepository;
 
     @PostConstruct
     public void initNode() {
@@ -64,4 +71,29 @@ public class NodeService {
 
         return result;
     }
+
+    public void addFolder (String name, String path) {
+        Long folderId = NumberUtils.stringToLong(name);
+        VideoFolder existingFolder = videoFolderRepository.findOne(folderId);
+
+        if (existingFolder == null) {  // create a new folder
+            VideoFolder newFolder = new VideoFolder(name, path, localNode.getName());
+        }
+        else {
+            // check if there is already a path on this node
+            if (existingFolder.getNodePathMap().containsKey(localNode.getName()) == false) {
+                existingFolder.addNode(localNode.getName(), path);
+            }
+            else {
+                log.warn("This folder has already been added on this node.");
+            }
+        }
+    }
+
+    public File getNodeFolderFile (VideoFolder folder) {
+        String path = folder.getNodePathMap().get(localNode.getName());
+        File folderFile = new File(path);
+        return folderFile;
+    }
+
 }

@@ -6,8 +6,10 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Document(indexName = "folder")
@@ -15,32 +17,19 @@ public class VideoFolder {
     @Id
     private Long id;
 
-    private List<String> path = new ArrayList();
-
     private String name;
 
-    private List<Node> nodes = new ArrayList();
+    private Map<String, String> nodePathMap;
 
-    public VideoFolder (String name, String path, Node node) {
+    public VideoFolder (String name, String node, String path) {
 
         this.name = name;
-        this.path.add(path);
-        this.nodes.add(node);
+        this.nodePathMap.put(node, path);
         this.id = NumberUtils.stringToLong(name);
     }
 
-    public void addNode (Node node, String path) {
-        this.path.add(path);
-        this.nodes.add(node);
+    public void addNode (String node, String path) {
+        this.nodePathMap.put(node, path);
     }
-
-    //Node class
-    /*public void addFolder (String name, String path) {
-        //if new folder:
-        VideoFolder newFolder = new VideoFolder(name, path, this);
-        //if existing folder:
-        Long folderId = NumberUtils.stringToLong(name);
-        //get folder where id = folderId -> folder.addNode
-    }*/
 
 }
