@@ -1,8 +1,7 @@
 package fr.letreguilly.restapi;
 
-/**
- * Created by letreguilly on 17/07/17.
- */
+import fr.letreguilly.business.NodeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
@@ -10,13 +9,16 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-@Path("/hello")
+@Path("/nodes")
 @Component
-public class HelloApi {
+public class NodeEntryPoint {
+
+    @Autowired
+    private NodeService nodeService;
 
     @GET
     @Produces({"application/json"})
     public Response getInfo() {
-        return Response.ok().entity(new String("{\"Hello Api\" : 1}")).build();
+        return Response.ok().entity(nodeService.getAllNodes()).build();
     }
 }

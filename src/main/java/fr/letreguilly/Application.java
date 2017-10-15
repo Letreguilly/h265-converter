@@ -22,17 +22,8 @@ public class Application {
     @Value("${app.name}")
     private String name;
 
-
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(Application.class);
-
-       /* try {
-            BinaryService.getBinary("ffmpeg");
-        } catch (IOException e) {
-            log.error("can not find binary ffmpeg", e);
-        }*/
-
     }
-
 
 }

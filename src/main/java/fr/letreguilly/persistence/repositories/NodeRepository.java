@@ -6,5 +6,5 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchCrudReposi
 import java.util.List;
 
 public interface NodeRepository extends ElasticsearchCrudRepository<Node, Long> {
-    public List<Node> findAll();
+
 }

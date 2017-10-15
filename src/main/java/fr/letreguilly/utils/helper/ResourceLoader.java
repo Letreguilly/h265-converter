@@ -20,29 +20,16 @@ public class ResourceLoader {
     private final static ObjectMapper objectMapper = new ObjectMapper();
 
     public static byte[] readByteArray(String fileName) throws IOException {
-        //URL fileURL = Thread.currentThread().getContextClassLoader().getResource(fileName);
-        //if (fileURL == null) {
-        //    throw new IOException("Cannot get resource file \"" + fileName +"\"");
-        //}
-
-        //Handle Windows path (starts with HDD letter but we have to remove /)
-        //String testFilePath = fileURL.getFile().replaceFirst("^/([CD])", "$1");
-
         byte[] encoded;
-        //try {
-          //  encoded = Files.readAllBytes(Paths.get(testFilePath));
 
-        //} catch (Exception e) {
-            // Load from a jar
-            ClassPathResource resource = new ClassPathResource(fileName);
-            try {
-                InputStream inputStream = resource.getInputStream();
-                encoded = IOUtils.toByteArray(inputStream);
+        ClassPathResource resource = new ClassPathResource(fileName);
+        try {
+            InputStream inputStream = resource.getInputStream();
+            encoded = IOUtils.toByteArray(inputStream);
 
-            } catch (IOException e1) {
-                throw new RuntimeException("Error reading resource file \"" + fileName +"\"");
-            }
-        //}
+        } catch (IOException e1) {
+            throw new RuntimeException("Error reading resource file \"" + fileName + "\"");
+        }
 
         log.debug("Read resource file \"" + fileName + "\"");
         return encoded;
