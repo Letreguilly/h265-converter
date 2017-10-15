@@ -70,11 +70,19 @@ public class NodeService {
         }
     }
 
+    /**
+     * register a new node to the cluster
+     * @param node the node to register
+     * @return the registered node
+     */
     public Node registerNewNode(Node node){
         return nodeRepository.save(localNode);
     }
 
-
+    /**
+     * return all the node of the cluster
+     * @return  all the node of the cluster
+     */
     public List<Node> getAllNodes(){
         return  clusterNodes;
     }
