@@ -7,30 +7,31 @@ import org.springframework.data.elasticsearch.annotations.Document;
 @Data
 @Document(indexName = "video")
 public class Video {
-	@Id
+    @Id
     private Long id;
 
-	private String md5;
+    private String md5;
 
-	private String path;
+    private String path;
 
-	private String name;
+    private String name;
 
-	private VideoCodec codec;
+    private VideoCodec codec;
 
-	private Long size;
+    private Long size;
 
-	private VideoExtension extension;
+    private VideoExtension extension;
 
     public void setMd5(String md5) {
-        this.md5 = md5;
+        if (id == null) {
+            this.md5 = md5;
 
-        byte[] md5Bytes = md5.getBytes();
-        this.id = 0L;
+            byte[] md5Bytes = md5.getBytes();
+            this.id = 0L;
 
-        for(int i = 0; i < md5Bytes.length ; i++){
-            this.id = this.id + (md5Bytes[i] * (256 ^ i));
+            for (int i = 0; i < md5Bytes.length; i++) {
+                this.id = this.id + (md5Bytes[i] * (256 ^ i));
+            }
         }
-
     }
 }
