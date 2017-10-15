@@ -3,6 +3,7 @@ package fr.letreguilly.business;
 import fr.letreguilly.persistence.entities.Node;
 import fr.letreguilly.persistence.repositories.NodeRepository;
 import fr.letreguilly.utils.helper.CpuUtils;
+import fr.letreguilly.utils.helper.NumberUtils;
 import fr.letreguilly.utils.helper.OsUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class NodeService {
     private NodeRepository nodeRepository;
 
     @PostConstruct
-    public void initNode() {
+    public void initLocalNode() {
         try {
             localNode = new Node();
 
@@ -38,7 +39,7 @@ public class NodeService {
             byte[] mac = network.getHardwareAddress();
 
             //set info
-            localNode.setId(this.bytesToLong(mac));
+            localNode.setId(NumberUtils.bytesToLong(mac));
             localNode.setName(ip.getHostName());
             localNode.setIPAddress(ip.getAddress());
             localNode.setMacAddress(mac);
@@ -46,6 +47,7 @@ public class NodeService {
             localNode.setCpuCore(CpuUtils.getNumberOfCPUCores());
             localNode.setOperatingSystem(OsUtils.getOS());
 
+            //save to db
             localNode = nodeRepository.save(localNode);
             clusterNodes.addAll(nodeRepository.findAll());
         } catch (UnknownHostException | SocketException e) {
@@ -54,14 +56,5 @@ public class NodeService {
         }
     }
 
-    public  long bytesToLong(byte[] b) {
-        long result = 0;
 
-        for (int i = 0; i < b.length; i++) {
-            result <<= 8;
-            result |= (b[i] & 0xFF);
-        }
-
-        return result;
-    }
 }
