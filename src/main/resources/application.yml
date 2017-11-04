@@ -14,5 +14,5 @@ spring:
                 cluster.name: video-converter
                 discovery.zen.ping.multicast.enabled: true
                 network.host: ["_local_", "_site_"]
-                node.name: #{'$'}{HOSTNAME}
+#                node.name: #{'$'}{HOSTNAME}
 

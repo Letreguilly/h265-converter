@@ -10,3 +10,6 @@ bin/
 #maven
 dependency-reduced-pom.xml
 
+src/test/
+src/main/java/fr/letreguilly/restapi/HelloApi.java
+src/main/java/fr/letreguilly/webui/vaadin/
