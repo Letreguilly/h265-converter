@@ -21,10 +21,10 @@ public class FolderApi {
     }
 
     @GET
-    @Path("{id}")
+    @Path("{nodeName}")
     @Produces({"application/json"})
-    public Response getFolderById(@PathParam("id") long id) {
-        return Response.ok().entity(folderService.getVideoFolderById(id)).build();
+    public Response getFoldersByNodeName(@PathParam("nodeName") String nodeName) {
+        return Response.ok().entity(folderService.getAllFoldersByNode(nodeName)).build();
     }
 
     @GET

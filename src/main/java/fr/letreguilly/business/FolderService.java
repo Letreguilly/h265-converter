@@ -27,11 +27,11 @@ public class FolderService {
         return clusterVideoFolders;
     }
 
-    public List<VideoFolder> getAllFoldersByNode(Node node) {
+    public List<VideoFolder> getAllFoldersByNode(String nodeName) {
         List<VideoFolder> nodeVideoFolders = new ArrayList();
 
         videoFolderRepository.findAll().forEach(folder -> {
-            if (folder.getNodePathMap().containsKey(node.getName())) {
+            if (folder.getNodePathMap().containsKey(nodeName)) {
                 nodeVideoFolders.add(folder);
             }
         });

@@ -32,6 +32,14 @@ public class VideoFolder {
         this.id = NumberUtils.stringToLong(name);
     }
 
+    private Long getId() {
+        return id;
+    }
+
+    private void setId(Long id) {
+        this.id = id;
+    }
+
     public void addNode(String nodeName, String path) {
         this.nodePathMap.put(nodeName, path);
     }
