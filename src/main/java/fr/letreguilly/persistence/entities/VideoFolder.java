@@ -21,19 +21,19 @@ public class VideoFolder {
     private String name;
 
     //Key: node, value: path
-    private Map<Long, String> nodePathMap = new HashMap();
+    private Map<String, String> nodePathMap = new HashMap();
 
-    public VideoFolder () {
+    public VideoFolder() {
     }
 
-    public VideoFolder (String name, Long node, String path) {
+    public VideoFolder(String name, String nodeName, String path) {
         this.name = name;
-        this.nodePathMap.put(node, path);
+        this.nodePathMap.put(nodeName, path);
         this.id = NumberUtils.stringToLong(name);
     }
 
-    public void addNode (Long node, String path) {
-        this.nodePathMap.put(node, path);
+    public void addNode(String nodeName, String path) {
+        this.nodePathMap.put(nodeName, path);
     }
 
 }

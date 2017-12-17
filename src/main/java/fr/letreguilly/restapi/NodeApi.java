@@ -5,14 +5,12 @@ import fr.letreguilly.persistence.entities.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
-@Path("/nodes")
+@Path("/node")
 @Component
-public class NodeEntryPoint {
+public class NodeApi {
 
     @Autowired
     private NodeService nodeService;
@@ -24,9 +22,15 @@ public class NodeEntryPoint {
     }
 
     @GET
-    @Path("/folders")
+    @Path("{name}")
     @Produces({"application/json"})
-    public Response getFolders(Node node) {
-        return Response.ok().entity(nodeService.getAllFoldersByNode(node)).build();
+    public Response getNodeByName(@PathParam("name") String name) {
+        Node node = nodeService.getNodeByName(name);
+
+        if (node != null) {
+            return Response.ok().status(200).entity(node).build();
+        } else {
+            return Response.ok().status(404).build();
+        }
     }
 }

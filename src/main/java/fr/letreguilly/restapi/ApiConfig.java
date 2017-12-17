@@ -10,8 +10,8 @@ import javax.ws.rs.ApplicationPath;
 public class ApiConfig extends ResourceConfig {
 
     public ApiConfig() {
-        this.register(HealthCheckEntryPoint.class);
-        this.register(NodeEntryPoint.class);
-        this.register(FolderEntryPoint.class);
+        this.register(NodeApi.class);
+        this.register(FolderApi.class);
+        this.register(InfoApi.class);
     }
 }

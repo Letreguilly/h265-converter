@@ -21,22 +21,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Hex;
+
 @Slf4j
 @Service
 public class NodeService {
 
     private Node localNode;
 
-    private List<Node> clusterNodes = new ArrayList();
-
     @Autowired
     private NodeRepository nodeRepository;
 
-    @Autowired
-    private VideoFolderRepository videoFolderRepository;
+
 
     @PostConstruct
-    public void initLocalNode() {
+    private void initLocalNode() {
         try {
             localNode = new Node();
 
@@ -46,23 +45,19 @@ public class NodeService {
             byte[] mac = network.getHardwareAddress();
 
             //set info
-            this.localNode.setId(NumberUtils.bytesToLong(mac));
+            //this.localNode.setId(NumberUtils.bytesToLong(mac));
             this.localNode.setName(ip.getHostName());
-            this.localNode.setIPAddress(ip.getAddress());
-            this.localNode.setMacAddress(mac);
+            this.localNode.setIPAddress(ip.getHostAddress());
+            this.localNode.setMacAddress(Hex.encodeHexString(mac));
             this.localNode.setCpuArch(CpuUtils.getCpuArch());
             this.localNode.setCpuCore(CpuUtils.getNumberOfCPUCores());
             this.localNode.setOperatingSystem(OsUtils.getOS());
 
-            //get all node
-            nodeRepository.findAll().forEach(node -> clusterNodes.add(node));
-
             //register node
-            if(this.clusterNodes.contains(localNode)){
-                log.info("Node "+ this.localNode.getName() + " already registered, updating information");
+            if (this.getAllNodes().contains(localNode)) {
+                log.info("Node " + this.localNode.getName() + " already registered, updating information");
                 this.localNode = nodeRepository.save(localNode);
-            }else{
-                log.info("Register new node " + this.localNode.getName());
+            } else {
                 this.localNode = this.registerNewNode(localNode);
             }
         } catch (UnknownHostException | SocketException e) {
@@ -73,64 +68,40 @@ public class NodeService {
 
     /**
      * register a new node to the cluster
+     *
      * @param node the node to register
      * @return the registered node
      */
-    public Node registerNewNode(Node node){
+    public Node registerNewNode(Node node) {
+        log.info("Register new node " + this.localNode.getName());
         return nodeRepository.save(localNode);
     }
 
     /**
      * return all the node of the cluster
-     * @return  all the node of the cluster
+     *
+     * @return all the node of the cluster
      */
-    public List<Node> getAllNodes(){
-        return  clusterNodes;
+    public List<Node> getAllNodes() {
+        List<Node> nodeList = new ArrayList();
+        this.nodeRepository.findAll().forEach(node -> nodeList.add(node));
+        return nodeList;
     }
 
-    public List<VideoFolder> getAllFolders(){
-        List<VideoFolder> clusterVideoFolders = new ArrayList();
-        videoFolderRepository.findAll().forEach(folder -> clusterVideoFolders.add(folder));
-        return  clusterVideoFolders;
+    /**
+     * return the desired node if exist
+     * @param name the id of the desired node
+     * @return the node
+     */
+    public Node getNodeByName(String name){
+        return this.nodeRepository.findByName(name);
     }
 
-    public List<VideoFolder> getAllFoldersByNode(Node node){
-        List<VideoFolder> nodeVideoFolders = new ArrayList();
-
-        videoFolderRepository.findAll().forEach(folder -> {
-            if(folder.getNodePathMap().containsKey(node.getId())) {
-                nodeVideoFolders.add(folder);
-            }
-        });
-
-        return  nodeVideoFolders;
+    /**
+     * return the local node
+     * @return the local node
+     */
+    public Node getLocalNode() {
+        return localNode;
     }
-
-    public VideoFolder addFolder (String name, String path) {
-        Long folderId = NumberUtils.stringToLong(name);
-        VideoFolder existingFolder = videoFolderRepository.findOne(folderId);
-
-        if (existingFolder == null) {  // create a new folder
-            VideoFolder newFolder = new VideoFolder(name, localNode.getId(), path);
-            return videoFolderRepository.save(newFolder);
-        }
-        else {
-            // check if there is already a path on this node
-            if (existingFolder.getNodePathMap().containsKey(localNode.getName()) == false) {
-                existingFolder.addNode(localNode.getId(), path);
-                return videoFolderRepository.save(existingFolder);
-            }
-            else {
-                log.warn("This folder has already been added on this node.");
-            }
-        }
-        return null;
-    }
-
-    public File getNodeFolderFile (VideoFolder folder) {
-        String path = folder.getNodePathMap().get(localNode.getId());
-        File folderFile = new File(path);
-        return folderFile;
-    }
-
 }

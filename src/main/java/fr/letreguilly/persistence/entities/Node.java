@@ -1,5 +1,6 @@
 package fr.letreguilly.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import fr.letreguilly.utils.enumeration.CpuArch;
 import fr.letreguilly.utils.enumeration.OsName;
 import fr.letreguilly.utils.helper.NumberUtils;
@@ -10,14 +11,15 @@ import org.springframework.data.elasticsearch.annotations.Document;
 @Data
 @Document(indexName = "node", shards = 2, replicas = 1)
 public class Node {
+
     @Id
     private Long id;
 
     private String name;
 
-    private byte[] IPAddress;
+    private String IPAddress;
 
-    private byte[] macAddress;
+    private String macAddress;
 
     private Integer cpuCore;
 
@@ -25,30 +27,16 @@ public class Node {
 
     private CpuArch cpuArch;
 
-    @Data
-    @Document(indexName = "video", shards = 2, replicas = 1)
-    public static class Video {
-        @Id
-        private Long id;
+    public void setName(String name) {
+        this.id = NumberUtils.bytesToLong(name.getBytes());
+        this.name = name;
+    }
 
-        private String md5;
+    private Long getId() {
+        return id;
+    }
 
-        private String path;
-
-        private String name;
-
-        private VideoCodec codec;
-
-        private Long size;
-
-        private VideoExtension extension;
-
-        public void setMd5(String md5) {
-            this.md5 = md5;
-
-            if (id == null) {
-                this.id = NumberUtils.stringToLong(md5);
-            }
-        }
+    private void setId(Long id) {
+        this.id = id;
     }
 }

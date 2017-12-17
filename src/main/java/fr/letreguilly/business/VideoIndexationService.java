@@ -1,6 +1,7 @@
 package fr.letreguilly.business;
 
 import fr.letreguilly.persistence.entities.Node;
+import fr.letreguilly.persistence.entities.Video;
 import fr.letreguilly.persistence.entities.VideoExtension;
 import fr.letreguilly.persistence.repositories.VideoRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -29,12 +30,12 @@ public class VideoIndexationService {
         this.indexFolder(baseFolder);
     }*/
 
-    public List<Node.Video> indexFolder(File folderToIndex) {
+    public List<Video> indexFolder(File folderToIndex) {
         return this.indexFolder(folderToIndex, null);
     }
 
-    public List<Node.Video> indexFolder(File folderToIndex, Date lastIndexationDate) {
-        List<Node.Video> indexedVideo = new ArrayList();
+    public List<Video> indexFolder(File folderToIndex, Date lastIndexationDate) {
+        List<Video> indexedVideo = new ArrayList();
 
         if (folderToIndex.exists() && folderToIndex.canRead() && folderToIndex.isDirectory()) {
             //get file list for directory
@@ -46,7 +47,7 @@ public class VideoIndexationService {
             }
 
             //convert to video
-            List<Node.Video> videoList = VideoIndexationService.convertFilesToVideo(directoryToIndexFileList, folderToIndex);
+            List<Video> videoList = VideoIndexationService.convertFilesToVideo(directoryToIndexFileList, folderToIndex);
             videoRepository.save(videoList);
 
 
@@ -62,11 +63,11 @@ public class VideoIndexationService {
     }
 
 
-    public static List<Node.Video> convertFilesToVideo(List<File> fileList, File baseFolder) {
-        List<Node.Video> videoList = new ArrayList();
+    public static List<Video> convertFilesToVideo(List<File> fileList, File baseFolder) {
+        List<Video> videoList = new ArrayList();
 
         for (File f : fileList) {
-            Optional<Node.Video> video = VideoIndexationService.convertFileToVideo(f, baseFolder);
+            Optional<Video> video = VideoIndexationService.convertFileToVideo(f, baseFolder);
             if (video.isPresent()) {
                 videoList.add(video.get());
             }
@@ -75,16 +76,16 @@ public class VideoIndexationService {
         return videoList;
     }
 
-    public static Optional<Node.Video> convertFileToVideo(File videoFile, File BaseFolder) {
+    public static Optional<Video> convertFileToVideo(File videoFile, File BaseFolder) {
         //optional result
-        Optional<Node.Video> videoOptional = Optional.empty();
+        Optional<Video> videoOptional = Optional.empty();
 
         // get video extension eg mkv
         String extension = FilenameUtils.getExtension(videoFile.getName());
 
         //convert file to video object
         if (EnumUtils.isValidEnum(VideoExtension.class, extension)) {
-            Node.Video video = new Node.Video();
+            Video video = new Video();
 
             video.setName(videoFile.getName());
             video.setExtension(VideoExtension.valueOf(extension));
