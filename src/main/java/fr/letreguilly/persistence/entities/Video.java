@@ -15,6 +15,8 @@ public class Video {
 
     private String path;
 
+    private VideoFolder videoFolder;
+
     private String name;
 
     private VideoCodec codec;
@@ -22,6 +24,13 @@ public class Video {
     private Long size;
 
     private VideoExtension extension;
+
+    public Video() {
+    }
+
+    public Video(VideoFolder videoFolder) {
+        this.videoFolder = videoFolder;
+    }
 
     public void setMd5(String md5) {
         this.md5 = md5;

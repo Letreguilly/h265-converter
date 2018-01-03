@@ -1,9 +1,12 @@
 package fr.letreguilly.restapi;
 
-import fr.letreguilly.business.FolderService;
-import fr.letreguilly.business.NodeService;
+import fr.letreguilly.persistence.service.NodeService;
+import fr.letreguilly.persistence.service.VideoFolderService;
+import fr.letreguilly.business.NodeControler;
 import fr.letreguilly.persistence.entities.Node;
+import fr.letreguilly.persistence.entities.Video;
 import fr.letreguilly.persistence.entities.VideoFolder;
+import fr.letreguilly.persistence.service.VideoService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,7 +26,10 @@ public class InfoApi {
     private NodeService nodeService;
 
     @Autowired
-    private FolderService folderService;
+    private VideoFolderService folderService;
+
+    @Autowired
+    private VideoService videoService;
 
     @GET
     @Produces({"application/json"})
@@ -31,6 +37,7 @@ public class InfoApi {
         InfoResponse infoResponse = new InfoResponse();
         infoResponse.setNodeList(nodeService.getAllNodes());
         infoResponse.setVideoFolderList(folderService.getAllFolders());
+        infoResponse.setVideoList(videoService.getAllVideo());
 
         return Response.ok().entity(infoResponse).build();
     }
@@ -39,5 +46,6 @@ public class InfoApi {
     public static class InfoResponse {
         private List<Node> nodeList = new ArrayList();
         private List<VideoFolder> videoFolderList = new ArrayList();
+        private List<Video> videoList = new ArrayList();
     }
 }

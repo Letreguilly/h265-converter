@@ -1,7 +1,8 @@
 package fr.letreguilly.restapi;
 
-import fr.letreguilly.business.NodeService;
+import fr.letreguilly.business.NodeControler;
 import fr.letreguilly.persistence.entities.Node;
+import fr.letreguilly.persistence.service.NodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

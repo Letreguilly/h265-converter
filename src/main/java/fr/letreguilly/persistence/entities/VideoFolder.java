@@ -1,16 +1,14 @@
 package fr.letreguilly.persistence.entities;
 
 
+import fr.letreguilly.Cluster;
 import fr.letreguilly.utils.helper.NumberUtils;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Data
 @Document(indexName = "folder")
@@ -20,7 +18,9 @@ public class VideoFolder {
 
     private String name;
 
-    //Key: node, value: path
+    private Date lastIndexationDate;
+
+    //Key: node name, value: path
     private Map<String, String> nodePathMap = new HashMap();
 
     public VideoFolder() {
@@ -40,8 +40,16 @@ public class VideoFolder {
         this.id = id;
     }
 
+    private void setIndexedNow(){
+        this.lastIndexationDate = Calendar.getInstance().getTime();
+    }
+
     public void addNode(String nodeName, String path) {
         this.nodePathMap.put(nodeName, path);
+    }
+
+    public boolean isLocal(){
+        return this.nodePathMap.containsKey(Cluster.localNode.getName());
     }
 
 }

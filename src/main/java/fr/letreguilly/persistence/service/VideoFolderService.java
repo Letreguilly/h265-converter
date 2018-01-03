@@ -1,5 +1,7 @@
-package fr.letreguilly.business;
+package fr.letreguilly.persistence.service;
 
+import fr.letreguilly.Cluster;
+import fr.letreguilly.business.NodeControler;
 import fr.letreguilly.persistence.entities.Node;
 import fr.letreguilly.persistence.entities.VideoFolder;
 import fr.letreguilly.persistence.repositories.VideoFolderRepository;
@@ -13,7 +15,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class FolderService {
+public class VideoFolderService {
 
     @Autowired
     private VideoFolderRepository videoFolderRepository;
@@ -39,8 +41,8 @@ public class FolderService {
         return nodeVideoFolders;
     }
 
-    public void addFolder(String name, String path) {
-        this.addFolder(this.nodeService.getLocalNode().getName(), name, path);
+    public VideoFolder addFolder(String name, String path) {
+        return this.addFolder(Cluster.localNode.getName(), name, path);
     }
 
     public VideoFolder addFolder(String nodeName, String name, String path) {

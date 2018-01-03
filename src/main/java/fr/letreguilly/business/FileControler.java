@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class FileService {
+public class FileControler {
 
     /**
      * recursive function to list all file present in a directory
@@ -21,7 +21,7 @@ public class FileService {
 
             for(int i = 0 ; i < currentDirectoryFiles.length; ++i){
                 if(currentDirectoryFiles[i].isDirectory()){
-                    fileList.addAll(FileService.listFile(currentDirectoryFiles[i]));
+                    fileList.addAll(FileControler.listFile(currentDirectoryFiles[i]));
                 }else{
                     fileList.add(currentDirectoryFiles[i]);
                 }

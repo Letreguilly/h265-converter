@@ -14,7 +14,7 @@ import java.io.IOException;
 
 @Slf4j
 @Service
-public class BinaryService {
+public class BinaryControler {
 
     @PostConstruct
     private void installFFmpegAtStartUp() throws IOException {
@@ -23,7 +23,26 @@ public class BinaryService {
 
     @PostConstruct
     private void installFFprobeAtStartUp() throws IOException {
-        this.getBinary("ffprobe");
+        Boolean result = this.getBinary("ffprobe");
+    }
+
+    /**
+     * @param name the name of the binary to extract
+     *             return the file to a binary
+     * @return the binary file (can not exist)
+     */
+    public File getBinaryFile(String name) {
+        //get binary name
+        String binaryFilepath;
+        if (OsUtils.getOS().equals(OsName.windows)) {
+            binaryFilepath = "./bin/" + name + ".exe";
+        } else {
+            binaryFilepath = "./bin/" + name;
+        }
+
+        File binaryFile = new File(binaryFilepath);
+
+        return binaryFile;
     }
 
     /**
@@ -35,15 +54,7 @@ public class BinaryService {
      */
     public boolean getBinary(String name) throws IOException {
 
-        //get binary name
-        String binaryFilepath;
-        if (OsUtils.getOS().equals(OsName.windows)) {
-            binaryFilepath = "./bin/" + name + ".exe";
-        } else {
-            binaryFilepath = "./bin/" + name;
-        }
-
-        File binaryFile = new File(binaryFilepath);
+        File binaryFile = this.getBinaryFile(name);
 
         if (binaryFile.exists()) {
             return true;

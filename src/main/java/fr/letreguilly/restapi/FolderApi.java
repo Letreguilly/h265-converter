@@ -1,6 +1,7 @@
 package fr.letreguilly.restapi;
 
-import fr.letreguilly.business.FolderService;
+import fr.letreguilly.persistence.service.VideoFolderService;
+import fr.letreguilly.persistence.entities.VideoFolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,7 @@ import javax.ws.rs.core.Response;
 public class FolderApi {
 
     @Autowired
-    private FolderService folderService;
+    private VideoFolderService folderService;
 
     @GET
     @Produces({"application/json"})
@@ -31,17 +32,13 @@ public class FolderApi {
     @Path("add")
     @Consumes({"application/json"})
     @Produces({"application/json"})
-    public Response addFolder(@QueryParam("nodeName")String nodeName, @QueryParam("folderName") String name, @QueryParam("path") String path) {
-        folderService.addFolder(nodeName, name, path);
-        return Response.ok().build();
-    }
+    public Response addFolder(@QueryParam("nodeName") String nodeName, @QueryParam("folderName") String name, @QueryParam("path") String path) {
+        VideoFolder localFolder = folderService.addFolder(nodeName, name, path);
 
-    @GET
-    @Path("/addLocalFolder")
-    @Consumes({"application/json"})
-    @Produces({"application/json"})
-    public Response addFolderToLocalNode( @QueryParam("name") String name, @QueryParam("path") String path) {
-        folderService.addFolder(name, path);
-        return Response.ok().build();
+        if (localFolder != null && localFolder.isLocal()) {
+            return Response.ok().build();
+        }else {
+            return Response.serverError().build();
+        }
     }
 }
