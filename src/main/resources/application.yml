@@ -1,6 +1,8 @@
 app:
     name: h265-converter
     message: Hello ${app.name}}
+    taskManager:
+        maxTaskNumber: 1
 
 server:
     port: 9000

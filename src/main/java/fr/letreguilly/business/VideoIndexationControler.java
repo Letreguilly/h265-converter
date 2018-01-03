@@ -24,7 +24,6 @@ public class VideoIndexationControler {
     @Autowired
     private VideoService videoService;
 
-
     public List<Video> indexLocalFolder(VideoFolder folder) {
 
         //setup
@@ -37,15 +36,15 @@ public class VideoIndexationControler {
 
             if (localFolder.exists() && localFolder.canRead() && localFolder.isDirectory()) {
                 //get file list for directory
-                List<File> directoryToIndexFileList = FileControler.listFile(localFolder);
+                List<File> directoryToIndexFileList = this.listFile(localFolder);
 
                 //filter by date
                 if (folder.getLastIndexationDate() != null) {
-                    directoryToIndexFileList = FileControler.filterByLastModificationDate(directoryToIndexFileList, folder.getLastIndexationDate());
+                    directoryToIndexFileList = this.filterByLastModificationDate(directoryToIndexFileList, folder.getLastIndexationDate());
                 }
 
                 //convert to video
-                List<Video> videoList = VideoIndexationControler.convertFilesToVideo(directoryToIndexFileList, folder, localFolder);
+                List<Video> videoList = this.convertFilesToVideo(directoryToIndexFileList, folder, localFolder);
                 this.videoService.save(videoList);
 
             } else if (localFolder.exists() == false) {
@@ -61,11 +60,11 @@ public class VideoIndexationControler {
     }
 
 
-    public static List<Video> convertFilesToVideo(List<File> fileList, VideoFolder videoFolder, File baseFolder) {
+    private List<Video> convertFilesToVideo(List<File> fileList, VideoFolder videoFolder, File baseFolder) {
         List<Video> videoList = new ArrayList();
 
         for (File f : fileList) {
-            Optional<Video> video = VideoIndexationControler.convertFileToVideo(f, videoFolder, baseFolder);
+            Optional<Video> video = this.convertFileToVideo(f, videoFolder, baseFolder);
             if (video.isPresent()) {
                 videoList.add(video.get());
             }
@@ -74,7 +73,7 @@ public class VideoIndexationControler {
         return videoList;
     }
 
-    public static Optional<Video> convertFileToVideo(File videoFile, VideoFolder videoFolder, File BaseFolder) {
+    private Optional<Video> convertFileToVideo(File videoFile, VideoFolder videoFolder, File BaseFolder) {
         //optional result
         Optional<Video> videoOptional = Optional.empty();
 
@@ -102,5 +101,49 @@ public class VideoIndexationControler {
         }
 
         return videoOptional;
+    }
+
+    /**
+     * recursive function to list all file present in a directory
+     *
+     * @param directory the directory to list
+     * @return the file list
+     */
+    private List<File> listFile(File directory) {  // or listFile(VideoFolder folder) and then File directory = NodeService.getNodeFolderFile(folder);
+        List<File> fileList = new ArrayList();
+
+        if (directory.canRead() && directory.isDirectory()) {
+
+            File[] currentDirectoryFiles = directory.listFiles();
+
+            for (int i = 0; i < currentDirectoryFiles.length; ++i) {
+                if (currentDirectoryFiles[i].isDirectory()) {
+                    fileList.addAll(this.listFile(currentDirectoryFiles[i]));
+                } else {
+                    fileList.add(currentDirectoryFiles[i]);
+                }
+            }
+        }
+
+        return fileList;
+    }
+
+    /**
+     * return file modified after the lastmodificationdate parameter
+     *
+     * @param filesToFilter        the list of file to filter
+     * @param lastModificationDate the last modification date
+     * @return
+     */
+    private List<File> filterByLastModificationDate(List<File> filesToFilter, Date lastModificationDate) {
+        List<File> filteredFiles = new ArrayList();
+
+        for (File f : filesToFilter) {
+            if (f.lastModified() > lastModificationDate.getTime()) {
+                filteredFiles.add(f);
+            }
+        }
+
+        return filteredFiles;
     }
 }
