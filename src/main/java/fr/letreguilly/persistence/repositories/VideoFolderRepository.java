@@ -6,5 +6,5 @@ import org.springframework.stereotype.Component;
 
 @Component
 public interface VideoFolderRepository extends ElasticsearchCrudRepository<VideoFolder, Long> {
-
+    VideoFolder findFirstByName(String name);
 }

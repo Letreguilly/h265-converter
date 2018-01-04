@@ -4,6 +4,7 @@ import fr.letreguilly.Cluster;
 import fr.letreguilly.persistence.entities.Video;
 import fr.letreguilly.persistence.entities.VideoExtension;
 import fr.letreguilly.persistence.entities.VideoFolder;
+import fr.letreguilly.persistence.service.VideoFolderService;
 import fr.letreguilly.persistence.service.VideoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -24,6 +25,23 @@ public class VideoIndexationControler {
     @Autowired
     private VideoService videoService;
 
+    @Autowired
+    private VideoFolderService videoFolderService;
+
+    public List<Video> indexAllLocalFolder() {
+        List<Video> videoList = new ArrayList();
+
+        for (VideoFolder videoFolder : videoFolderService.getAllFoldersByNode(Cluster.localNode.getName())) {
+            try {
+                videoList.addAll(this.indexLocalFolder(videoFolder));
+            } catch (Exception e) {
+                log.error("can not index local folder : " + videoFolder.getName() + " on node " + Cluster.localNode.getName(), e);
+            }
+        }
+
+        return videoList;
+    }
+
     public List<Video> indexLocalFolder(VideoFolder folder) {
 
         //setup
@@ -34,7 +52,9 @@ public class VideoIndexationControler {
         if (localFolderFilePath != null) {
             File localFolder = new File(localFolderFilePath);
 
-            if (localFolder.exists() && localFolder.canRead() && localFolder.isDirectory()) {
+            if (localFolder.exists() && localFolder.canRead() && localFolder.isDirectory() && localFolder.lastModified() > folder.getLastIndexationDate().getTime()) {
+                log.info("index folder " + localFolderFilePath + " on node " + Cluster.localNode.getName());
+
                 //get file list for directory
                 List<File> directoryToIndexFileList = this.listFile(localFolder);
 
@@ -44,8 +64,15 @@ public class VideoIndexationControler {
                 }
 
                 //convert to video
-                List<Video> videoList = this.convertFilesToVideo(directoryToIndexFileList, folder, localFolder);
-                this.videoService.save(videoList);
+                indexedVideo = this.convertFilesToVideo(directoryToIndexFileList, folder, localFolder);
+                this.videoService.save(indexedVideo);
+
+                //save last indexation date
+                folder.setIndexedNow();
+                this.videoFolderService.save(folder);
+
+                //print indexed video
+                indexedVideo.forEach(video -> log.info("index video " + localFolderFilePath + video.getPath()));
 
             } else if (localFolder.exists() == false) {
                 log.error("directory " + localFolder.getAbsolutePath() + " doesn't exist");
@@ -53,6 +80,8 @@ public class VideoIndexationControler {
                 log.error("access denied : directory " + localFolder.getAbsolutePath());
             } else if (localFolder.isDirectory() == false) {
                 log.error("directory " + localFolder.getAbsolutePath() + " is not a directory");
+            } else if(localFolder.lastModified() <= folder.getLastIndexationDate().getTime()){
+                log.info("no modification on folder " + localFolderFilePath + " since last indexation");
             }
         }
 
@@ -64,7 +93,7 @@ public class VideoIndexationControler {
         List<Video> videoList = new ArrayList();
 
         for (File f : fileList) {
-            Optional<Video> video = this.convertFileToVideo(f, videoFolder, baseFolder);
+            Optional<Video> video = this.indexVideo(f, videoFolder, baseFolder);
             if (video.isPresent()) {
                 videoList.add(video.get());
             }
@@ -73,7 +102,7 @@ public class VideoIndexationControler {
         return videoList;
     }
 
-    private Optional<Video> convertFileToVideo(File videoFile, VideoFolder videoFolder, File BaseFolder) {
+    private Optional<Video> indexVideo(File videoFile, VideoFolder videoFolder, File BaseFolder) {
         //optional result
         Optional<Video> videoOptional = Optional.empty();
 
@@ -84,11 +113,13 @@ public class VideoIndexationControler {
         if (EnumUtils.isValidEnum(VideoExtension.class, extension)) {
             Video video = new Video(videoFolder);
 
+            //various data
             video.setName(videoFile.getName());
             video.setExtension(VideoExtension.valueOf(extension));
             video.setSize(videoFile.length());
             video.setPath(videoFile.getAbsolutePath().substring(BaseFolder.getAbsolutePath().length()));
 
+            //md5
             try {
                 FileInputStream fis = new FileInputStream(videoFile);
                 String md5 = DigestUtils.md5DigestAsHex(fis);
@@ -96,6 +127,9 @@ public class VideoIndexationControler {
             } catch (IOException e) {
                 log.error("can not determine md5 sum for file " + videoFile.getAbsolutePath());
             }
+
+            //codec
+
 
             videoOptional = Optional.of(video);
         }
@@ -146,4 +180,5 @@ public class VideoIndexationControler {
 
         return filteredFiles;
     }
+
 }

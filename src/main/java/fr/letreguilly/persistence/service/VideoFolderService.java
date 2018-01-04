@@ -3,6 +3,7 @@ package fr.letreguilly.persistence.service;
 import fr.letreguilly.Cluster;
 import fr.letreguilly.business.NodeControler;
 import fr.letreguilly.persistence.entities.Node;
+import fr.letreguilly.persistence.entities.Video;
 import fr.letreguilly.persistence.entities.VideoFolder;
 import fr.letreguilly.persistence.repositories.VideoFolderRepository;
 import fr.letreguilly.utils.helper.NumberUtils;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -41,33 +43,38 @@ public class VideoFolderService {
         return nodeVideoFolders;
     }
 
-    public VideoFolder addFolder(String name, String path) {
-        return this.addFolder(Cluster.localNode.getName(), name, path);
+    public VideoFolder getByName(String name) {
+        return this.videoFolderRepository.findFirstByName(name);
     }
 
-    public VideoFolder addFolder(String nodeName, String name, String path) {
+    public Optional<VideoFolder> addFolder(String nodeName, String name, String path) {
         Long folderId = NumberUtils.stringToLong(name);
         VideoFolder existingFolder = videoFolderRepository.findOne(folderId);
         Node node = this.nodeService.getNodeByName(nodeName);
+        Optional<VideoFolder> optionalVideoFolder = Optional.empty();
 
         if (existingFolder == null) {  // create a new folder
-            VideoFolder newFolder = new VideoFolder(name, nodeName, path);
+            VideoFolder newFolder = new VideoFolder(folderId, name, nodeName, path);
             log.info("Add new folder " + path + " on node " + nodeName);
-            return videoFolderRepository.save(newFolder);
+            optionalVideoFolder = Optional.of(videoFolderRepository.save(newFolder));
         } else {
             // check if there is already a path on this node
             if (existingFolder.getNodePathMap().containsKey(node.getName()) == false) {
                 existingFolder.addNode(nodeName, path);
                 log.info("Add folder " + path + " on node " + nodeName);
-                return videoFolderRepository.save(existingFolder);
+                optionalVideoFolder = Optional.of(videoFolderRepository.save(existingFolder));
             } else {
                 log.warn("This folder has already been added on this node.");
             }
         }
-        return null;
+        return optionalVideoFolder;
     }
 
     public VideoFolder getVideoFolderById(long id) {
         return videoFolderRepository.findOne(id);
+    }
+
+    public VideoFolder save(VideoFolder videoFolder) {
+        return this.videoFolderRepository.save(videoFolder);
     }
 }

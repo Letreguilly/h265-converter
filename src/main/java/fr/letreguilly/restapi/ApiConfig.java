@@ -13,5 +13,6 @@ public class ApiConfig extends ResourceConfig {
         this.register(NodeApi.class);
         this.register(FolderApi.class);
         this.register(InfoApi.class);
+        this.register(IndexationApi.class);
     }
 }

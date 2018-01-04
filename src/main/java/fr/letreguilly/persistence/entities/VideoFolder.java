@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 @Data
@@ -26,21 +27,14 @@ public class VideoFolder {
     public VideoFolder() {
     }
 
-    public VideoFolder(String name, String nodeName, String path) {
+    public VideoFolder(Long id, String name, String nodeName, String path) {
+        this.id = id;
         this.name = name;
         this.nodePathMap.put(nodeName, path);
         this.id = NumberUtils.stringToLong(name);
     }
 
-    private Long getId() {
-        return id;
-    }
-
-    private void setId(Long id) {
-        this.id = id;
-    }
-
-    private void setIndexedNow(){
+    public void setIndexedNow() {
         this.lastIndexationDate = Calendar.getInstance().getTime();
     }
 
@@ -48,8 +42,23 @@ public class VideoFolder {
         this.nodePathMap.put(nodeName, path);
     }
 
-    public boolean isLocal(){
+    public boolean isLocal() {
         return this.nodePathMap.containsKey(Cluster.localNode.getName());
+    }
+
+    public File getLocalFile() throws IOException {
+        if (this.isLocal()) {
+            File localFile = new File(this.getNodePathMap().get(Cluster.localNode.getName()));
+
+            if (localFile.exists()) {
+                return localFile;
+            } else {
+                throw new IOException("video folder " + this.getName() + " is present on the database but not present on the node " + Cluster.localNode.getName());
+            }
+        } else {
+            throw new IOException("video folder " + this.getName() + " is not present on node " + Cluster.localNode.getName());
+        }
+
     }
 
 }

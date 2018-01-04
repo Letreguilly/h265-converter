@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.Optional;
 
 @Path("/folder")
 @Component
@@ -33,9 +34,9 @@ public class FolderApi {
     @Consumes({"application/json"})
     @Produces({"application/json"})
     public Response addFolder(@QueryParam("nodeName") String nodeName, @QueryParam("folderName") String name, @QueryParam("path") String path) {
-        VideoFolder localFolder = folderService.addFolder(nodeName, name, path);
+        Optional<VideoFolder> localFolder = folderService.addFolder(nodeName, name, path);
 
-        if (localFolder != null && localFolder.isLocal()) {
+        if (localFolder.isPresent() && localFolder.get().isLocal()) {
             return Response.ok().build();
         }else {
             return Response.serverError().build();
