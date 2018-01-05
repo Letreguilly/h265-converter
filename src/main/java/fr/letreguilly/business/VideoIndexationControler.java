@@ -2,10 +2,12 @@ package fr.letreguilly.business;
 
 import fr.letreguilly.Cluster;
 import fr.letreguilly.persistence.entities.Video;
+import fr.letreguilly.persistence.entities.VideoCodec;
 import fr.letreguilly.persistence.entities.VideoExtension;
 import fr.letreguilly.persistence.entities.VideoFolder;
 import fr.letreguilly.persistence.service.VideoFolderService;
 import fr.letreguilly.persistence.service.VideoService;
+import fr.letreguilly.utils.helper.ProccessUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.EnumUtils;
@@ -27,6 +29,9 @@ public class VideoIndexationControler {
 
     @Autowired
     private VideoFolderService videoFolderService;
+
+    @Autowired
+    private BinaryControler binaryControler;
 
     public List<Video> indexAllLocalFolder() {
         List<Video> videoList = new ArrayList();
@@ -80,7 +85,7 @@ public class VideoIndexationControler {
                 log.error("access denied : directory " + localFolder.getAbsolutePath());
             } else if (localFolder.isDirectory() == false) {
                 log.error("directory " + localFolder.getAbsolutePath() + " is not a directory");
-            } else if(localFolder.lastModified() <= folder.getLastIndexationDate().getTime()){
+            } else if (localFolder.lastModified() <= folder.getLastIndexationDate().getTime()) {
                 log.info("no modification on folder " + localFolderFilePath + " since last indexation");
             }
         }
@@ -129,7 +134,17 @@ public class VideoIndexationControler {
             }
 
             //codec
+            String command = binaryControler.getBinaryFile("ffprobe").getAbsolutePath();
+            command += " -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 ";
+            command += "\"" + videoFile.getAbsolutePath() + "\"";
 
+            Optional<String> codec = ProccessUtils.execCommand(command);
+
+            if (codec.isPresent()) {
+                video.setCodec(VideoCodec.valueOf(codec.get()));
+            } else {
+                video.setCodec(VideoCodec.unknown);
+            }
 
             videoOptional = Optional.of(video);
         }

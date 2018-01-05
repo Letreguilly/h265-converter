@@ -19,7 +19,7 @@ public class VideoFolder {
 
     private String name;
 
-    private Date lastIndexationDate;
+    private Date lastIndexationDate = new Date(0L);
 
     //Key: node name, value: path
     private Map<String, String> nodePathMap = new HashMap();
