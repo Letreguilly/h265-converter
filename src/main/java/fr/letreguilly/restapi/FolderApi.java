@@ -39,7 +39,7 @@ public class FolderApi {
         if (localFolder.isPresent() && localFolder.get().isLocal()) {
             return Response.ok().build();
         }else {
-            return Response.serverError().build();
+            return Response.ok().entity("This folder has already been added on this node").build();
         }
     }
 }
