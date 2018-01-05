@@ -14,9 +14,7 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 public class ProccessUtils {
 
-
     public static Optional<String> execCommand(String command) {
-
         //setup
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         CommandLine commandline = CommandLine.parse(command);
@@ -32,9 +30,8 @@ public class ProccessUtils {
             //remove last \n
             if (response.length() >= 1 && OsUtils.isUnix()) {
                 response = response.substring(0, response.length() - 1);
-            } else if (response.length() >=2 && OsUtils.isWindows()){
+            } else if (response.length() >= 2 && OsUtils.isWindows()) {
                 response = response.substring(0, response.length() - 2);
-
             }
 
             return Optional.of(response);
@@ -44,14 +41,7 @@ public class ProccessUtils {
         }
     }
 
-    @Async
     public CompletableFuture<Optional<String>> execCommandAsync(String command) {
-        CompletableFuture<Optional<String>> futureResult = new CompletableFuture();
-
-        Optional<String> result = ProccessUtils.execCommand(command);
-
-        futureResult.complete(result);
-
-        return futureResult;
+        return CompletableFuture.supplyAsync(() -> ProccessUtils.execCommand(command));
     }
 }
