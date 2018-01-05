@@ -1,8 +1,8 @@
 app:
     name: h265-converter
     message: Hello ${app.name}}
-    taskManager:
-        maxTaskNumber: 1
+    crf: 23
+    preset: ultrafast
 
 server:
     port: 9000

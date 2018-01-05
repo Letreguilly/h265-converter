@@ -8,6 +8,7 @@ import fr.letreguilly.utils.helper.ProccessUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,14 @@ public class VideoConversionControler {
 
     private CompletableFuture<Optional<String>> currentTask = null;
 
+    private Video currentVideo;
+
+    @Value("${app.crf}")
+    private String crf;
+
+    @Value("${app.preset}")
+    private String preset;
+
     @Autowired
     private BinaryControler binaryControler;
 
@@ -37,11 +46,15 @@ public class VideoConversionControler {
         this.ffmpegFile = binaryControler.getBinaryFile("ffmpeg");
     }
 
-    @Scheduled(initialDelay = 10000, fixedRate = 10000)
-    private void convertionLoop() throws ExecutionException, InterruptedException {
+    public void convertionLoop() throws ExecutionException, InterruptedException {
         //print previous result and reset task
-        if(currentTask != null && currentTask.isDone()){
-            log.info("conversion result : " + currentTask.get().get());
+        if (currentTask != null && currentTask.isDone()) {
+            //log.info("conversion result : " + currentTask.get().get());
+
+            if(currentVideo.getFile().get().delete() == false){
+                log.error("failed to delete file " + currentVideo.getFile().get().getAbsolutePath());
+            }
+            this.videoService.delete(currentVideo);
         }
 
         //convert next video
@@ -62,12 +75,13 @@ public class VideoConversionControler {
     public void convertLocalVideo(Video video) {
 
         Optional<File> optionalFile = video.getFile();
+        this.currentVideo = video;
 
         if (optionalFile.isPresent()) {
             String command = "";
             command += ffmpegFile.getAbsolutePath();
             command += " -i \"" + optionalFile.get().getAbsolutePath();
-            command += "\" -c:v libx265 -preset medium -x265-params crf=23 -c:a aac -strict experimental -b:a 128k -v quiet \"";
+            command += "\" -c:v libx265 -preset " + preset + " -x265-params crf=" + crf + " -c:a aac -b:a 128k  \"";
             command += optionalFile.get().getAbsolutePath() + ".h265.mkv\"\n";
 
             log.info("convert video : " + video.getName() + " with command : " + command);

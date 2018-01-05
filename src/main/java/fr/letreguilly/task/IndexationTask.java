@@ -13,7 +13,7 @@ public class IndexationTask {
     @Autowired
     private VideoIndexationControler indexationControler;
 
-    @Scheduled(initialDelay = 600000, fixedRate = 3600000)
+    @Scheduled(initialDelay = 600000, fixedDelay = 3600000)
     public void run() {
         indexationControler.indexAllLocalFolder();
     }

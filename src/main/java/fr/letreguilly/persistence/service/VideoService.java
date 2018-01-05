@@ -38,6 +38,10 @@ public class VideoService {
         return this.videoRepository.save(video);
     }
 
+    public void delete(Video video){
+        this.videoRepository.delete(video);
+    }
+
     public List<Video> save(List<Video> video) {
         List<Video> savedVideo = new ArrayList();
         video.forEach(video1 -> savedVideo.add(this.save(video1)));
