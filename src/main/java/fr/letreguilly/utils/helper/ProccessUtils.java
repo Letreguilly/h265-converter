@@ -41,7 +41,7 @@ public class ProccessUtils {
         }
     }
 
-    public CompletableFuture<Optional<String>> execCommandAsync(String command) {
+    public static CompletableFuture<Optional<String>> execCommandAsync(String command) {
         return CompletableFuture.supplyAsync(() -> ProccessUtils.execCommand(command));
     }
 }

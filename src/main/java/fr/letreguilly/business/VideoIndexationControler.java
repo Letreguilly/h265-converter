@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,6 +24,13 @@ import java.util.*;
 @Slf4j
 @Service
 public class VideoIndexationControler {
+
+    private File ffprobeFile;
+
+    @PostConstruct
+    private void initd() {
+        this.ffprobeFile = binaryControler.getBinaryFile("ffprobe");
+    }
 
     @Autowired
     private VideoService videoService;
@@ -134,7 +142,7 @@ public class VideoIndexationControler {
             }
 
             //codec
-            String command = binaryControler.getBinaryFile("ffprobe").getAbsolutePath();
+            String command = this.ffprobeFile.getAbsolutePath();
             command += " -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 ";
             command += "\"" + videoFile.getAbsolutePath() + "\"";
 
